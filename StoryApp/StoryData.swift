@@ -1,5 +1,6 @@
 import SwiftUI
 
+// MARK: - StoryChoice Struct
 struct StoryChoice: Identifiable {
     let id = UUID()
     let title: String
@@ -8,6 +9,7 @@ struct StoryChoice: Identifiable {
     let nextSceneId: String
 }
 
+// MARK: - StoryScene Struct
 struct StoryScene {
     let id: String
     let title: String
@@ -17,17 +19,18 @@ struct StoryScene {
     let isEnding: Bool
 }
 
+// MARK: - StoryManager Class
 class StoryManager: ObservableObject {
     static let shared = StoryManager()
-    
+
     @Published var currentSceneId = "arrival"
     @Published var evidenceCollected = 0
     @Published var isLoadingDescription = false
-    
+
     var currentScene: StoryScene {
         scenes[currentSceneId] ?? initialScene
     }
-    
+
     private let initialScene = StoryScene(
         id: "arrival",
         title: "The Vanished Mogul",
@@ -49,13 +52,13 @@ class StoryManager: ObservableObject {
         ],
         isEnding: false
     )
-    
+
     @Published private var scenes: [String: StoryScene] = [:]
-    
+
     private init() {
         setupScenes()
     }
-    
+
     private func setupScenes() {
         scenes["arrival"] = initialScene
         
@@ -220,75 +223,6 @@ class StoryManager: ObservableObject {
             isEnding: false
         )
         
-        // 4B. Mistress Investigation
-        scenes["mistress_investigation"] = StoryScene(
-            id: "mistress_investigation",
-            title: "The Other Woman",
-            description: "The mistress claims innocence but mentions a mysterious meeting.",
-            evidencePercentage: 60,
-            choices: [
-                StoryChoice(
-                    title: "Rush to Docks",
-                    description: "Head there immediately",
-                    icon: "arrow.right.circle.fill",
-                    nextSceneId: "ending_justice"
-                ),
-                StoryChoice(
-                    title: "Press Further",
-                    description: "Demand more details",
-                    icon: "person.fill.questionmark",
-                    nextSceneId: "ending_confession"
-                )
-            ],
-            isEnding: false
-        )
-        
-        // 4C. Dock Stakeout
-        scenes["dock_stakeout"] = StoryScene(
-            id: "dock_stakeout",
-            title: "Midnight Watch",
-            description: "You spot a shadowy figure leaving a boat. Time to act.",
-            evidencePercentage: 60,
-            choices: [
-                StoryChoice(
-                    title: "Follow Quietly",
-                    description: "Trail them discreetly",
-                    icon: "footprints.fill",
-                    nextSceneId: "ending_scheme"
-                ),
-                StoryChoice(
-                    title: "Confront",
-                    description: "Approach directly",
-                    icon: "person.fill.questionmark",
-                    nextSceneId: "ending_justice"
-                )
-            ],
-            isEnding: false
-        )
-        
-        // 4D. Key Search
-        scenes["search_key"] = StoryScene(
-            id: "search_key",
-            title: "Hidden Map",
-            description: "A map found inside the drawer reveals a secret location.",
-            evidencePercentage: 60,
-            choices: [
-                StoryChoice(
-                    title: "Follow Map",
-                    description: "Track the location",
-                    icon: "map.fill",
-                    nextSceneId: "ending_discovery"
-                ),
-                StoryChoice(
-                    title: "Confront Family",
-                    description: "Show your findings",
-                    icon: "person.2.fill",
-                    nextSceneId: "ending_confession"
-                )
-            ],
-            isEnding: false
-        )
-        
         // Endings
         scenes["ending_justice"] = StoryScene(
             id: "ending_justice",
@@ -307,118 +241,10 @@ class StoryManager: ObservableObject {
             choices: [],
             isEnding: true
         )
-        
-        scenes["ending_scheme"] = StoryScene(
-            id: "ending_scheme",
-            title: "The Great Escape",
-            description: "The disappearance was staged to escape debts. You expose the scam, but the businessman vanishes, leaving chaos behind.",
-            evidencePercentage: 100,
-            choices: [],
-            isEnding: true
-        )
-        
-        scenes["ending_discovery"] = StoryScene(
-            id: "ending_discovery",
-            title: "Hidden Truth",
-            description: "The map leads to a hideout with proof of the family's plot. Their exposure brings scandal, but you're offered a major case in the city.",
-            evidencePercentage: 100,
-            choices: [],
-            isEnding: true
-        )
-        
-        // Financial Records Investigation
-        scenes["financial_records"] = StoryScene(
-            id: "financial_records",
-            title: "Paper Trail",
-            description: "The financial records reveal a complex web of debts and suspicious transactions.",
-            evidencePercentage: 60,
-            choices: [
-                StoryChoice(
-                    title: "Follow Money",
-                    description: "Trace the transactions",
-                    icon: "dollarsign.circle.fill",
-                    nextSceneId: "ending_scheme"
-                ),
-                StoryChoice(
-                    title: "Confront Family",
-                    description: "Present the evidence",
-                    icon: "person.2.fill",
-                    nextSceneId: "ending_confession"
-                )
-            ],
-            isEnding: false
-        )
-        
-        // House Search Results
-        scenes["house_search"] = StoryScene(
-            id: "house_search",
-            title: "Hidden Evidence",
-            description: "You discover letters and photographs revealing a deeper conspiracy.",
-            evidencePercentage: 60,
-            choices: [
-                StoryChoice(
-                    title: "Investigate Further",
-                    description: "Follow the new leads",
-                    icon: "magnifyingglass.circle.fill",
-                    nextSceneId: "ending_discovery"
-                ),
-                StoryChoice(
-                    title: "Confront Wife",
-                    description: "Show the evidence",
-                    icon: "person.fill.questionmark",
-                    nextSceneId: "ending_confession"
-                )
-            ],
-            isEnding: false
-        )
-        
-        // Police Involvement
-        scenes["police_involvement"] = StoryScene(
-            id: "police_involvement",
-            title: "Official Investigation",
-            description: "The police set up a sting operation based on your evidence.",
-            evidencePercentage: 60,
-            choices: [
-                StoryChoice(
-                    title: "Join Operation",
-                    description: "Work with the police",
-                    icon: "shield.fill",
-                    nextSceneId: "ending_justice"
-                ),
-                StoryChoice(
-                    title: "Independent Search",
-                    description: "Continue alone",
-                    icon: "person.fill",
-                    nextSceneId: "ending_discovery"
-                )
-            ],
-            isEnding: false
-        )
-        
-        // Forced Drawer
-        scenes["forced_drawer"] = StoryScene(
-            id: "forced_drawer",
-            title: "Broken Secret",
-            description: "The forced drawer reveals damaging documents about the family.",
-            evidencePercentage: 60,
-            choices: [
-                StoryChoice(
-                    title: "Analyze Documents",
-                    description: "Study the evidence",
-                    icon: "doc.text.magnifyingglass",
-                    nextSceneId: "ending_discovery"
-                ),
-                StoryChoice(
-                    title: "Immediate Action",
-                    description: "Act on the information",
-                    icon: "arrow.right.circle.fill",
-                    nextSceneId: "ending_justice"
-                )
-            ],
-            isEnding: false
-        )
     }
-    
+
+    // MARK: - Story Management Functions
+
     func moveToScene(_ sceneId: String) {
         withAnimation {
             currentSceneId = sceneId
@@ -427,22 +253,22 @@ class StoryManager: ObservableObject {
             }
         }
     }
-    
+
     func resetStory() {
         currentSceneId = "arrival"
         evidenceCollected = 0
     }
-    
+
     func updateCurrentSceneDescription(for sceneId: String, with newDescription: String) {
         if var scene = scenes[sceneId] {
             scene.description = newDescription
             scenes[sceneId] = scene
         }
     }
-    
+
     func fetchNewDescription(for genre: String) {
         isLoadingDescription = true
-        
+
         // Iterate over all scenes to update their descriptions
         for (sceneId, scene) in scenes {
             let currentStoryPart = scene.description
@@ -475,4 +301,4 @@ class StoryManager: ObservableObject {
             }.resume()
         }
     }
-} 
+}
