@@ -1,10 +1,15 @@
 import Foundation
 
+// MARK: - Face Detection Response Models
+/// These models represent the response structure for face detection results
+/// including the detected faces, their attributes, and video metadata.
+
+// MARK: FaceDetectionResponse
 struct FaceDetectionResponse: Codable {
-    let faces: [FaceWrapper]
-    let nextToken: String?
-    let status: String?
-    let videoMetadata: VideoMetadata?
+    let faces: [FaceWrapper]              // Array of face wrappers containing face details and timestamp
+    let nextToken: String?                // Token for pagination if applicable
+    let status: String?                   // Status message from the detection service
+    let videoMetadata: VideoMetadata?     // Metadata of the video processed
 
     enum CodingKeys: String, CodingKey {
         case faces = "faces"
@@ -14,9 +19,10 @@ struct FaceDetectionResponse: Codable {
     }
 }
 
+// MARK: FaceWrapper
 struct FaceWrapper: Codable {
-    let face: Face
-    let timestamp: Int
+    let face: Face                        // Detailed face information
+    let timestamp: Int                    // Timestamp of the detection within the video
 
     enum CodingKeys: String, CodingKey {
         case face = "Face"
@@ -24,22 +30,23 @@ struct FaceWrapper: Codable {
     }
 }
 
+// MARK: Face
 struct Face: Codable {
-    let ageRange: AgeRange
-    let beard: Attribute
-    let boundingBox: BoundingBox
-    let confidence: Double
-    let emotions: [Emotion]
-    let eyeglasses: Attribute
-    let eyesOpen: Attribute
-    let gender: Gender
-    let landmarks: [Landmark]
-    let mouthOpen: Attribute
-    let mustache: Attribute
-    let pose: Pose
-    let quality: Quality
-    let smile: Attribute
-    let sunglasses: Attribute
+    let ageRange: AgeRange                // Age range of the detected face
+    let beard: Attribute                  // Beard detection details
+    let boundingBox: BoundingBox          // Coordinates of the face in the image
+    let confidence: Double                // Overall detection confidence
+    let emotions: [Emotion]               // List of detected emotions with confidence scores
+    let eyeglasses: Attribute             // Eyeglasses attribute
+    let eyesOpen: Attribute               // Eyes open attribute
+    let gender: Gender                    // Gender detection details
+    let landmarks: [Landmark]             // Facial landmarks
+    let mouthOpen: Attribute              // Mouth open attribute
+    let mustache: Attribute               // Mustache detection details
+    let pose: Pose                        // Pose information (pitch, roll, yaw)
+    let quality: Quality                  // Quality metrics (brightness, sharpness)
+    let smile: Attribute                  // Smile attribute
+    let sunglasses: Attribute             // Sunglasses attribute
 
     enum CodingKeys: String, CodingKey {
         case ageRange = "AgeRange"
@@ -60,9 +67,10 @@ struct Face: Codable {
     }
 }
 
+// MARK: AgeRange
 struct AgeRange: Codable {
-    let high: Int
-    let low: Int
+    let high: Int                         // Upper bound of the detected age range
+    let low: Int                          // Lower bound of the detected age range
 
     enum CodingKeys: String, CodingKey {
         case high = "High"
@@ -70,9 +78,10 @@ struct AgeRange: Codable {
     }
 }
 
+// MARK: Attribute
 struct Attribute: Codable {
-    let confidence: Double
-    let value: Bool
+    let confidence: Double                // Confidence score for the attribute
+    let value: Bool                       // Boolean value indicating presence or absence
 
     enum CodingKeys: String, CodingKey {
         case confidence = "Confidence"
@@ -80,11 +89,12 @@ struct Attribute: Codable {
     }
 }
 
+// MARK: BoundingBox
 struct BoundingBox: Codable {
-    let height: Double
-    let left: Double
-    let top: Double
-    let width: Double
+    let height: Double                    // Height of the bounding box
+    let left: Double                      // Left coordinate of the bounding box
+    let top: Double                       // Top coordinate of the bounding box
+    let width: Double                     // Width of the bounding box
 
     enum CodingKeys: String, CodingKey {
         case height = "Height"
@@ -94,9 +104,10 @@ struct BoundingBox: Codable {
     }
 }
 
+// MARK: Emotion
 struct Emotion: Codable {
-    let confidence: Double
-    let type: String
+    let confidence: Double                // Confidence score for the emotion
+    let type: String                      // Type of emotion (e.g., HAPPY, SAD)
 
     enum CodingKeys: String, CodingKey {
         case confidence = "Confidence"
@@ -104,9 +115,10 @@ struct Emotion: Codable {
     }
 }
 
+// MARK: Gender
 struct Gender: Codable {
-    let confidence: Double
-    let value: String
+    let confidence: Double                // Confidence score for gender detection
+    let value: String                     // Gender value (e.g., Male, Female)
 
     enum CodingKeys: String, CodingKey {
         case confidence = "Confidence"
@@ -114,10 +126,11 @@ struct Gender: Codable {
     }
 }
 
+// MARK: Landmark
 struct Landmark: Codable {
-    let type: String
-    let x: Double
-    let y: Double
+    let type: String                      // Type of landmark (e.g., eye, nose)
+    let x: Double                         // X-coordinate of the landmark
+    let y: Double                         // Y-coordinate of the landmark
 
     enum CodingKeys: String, CodingKey {
         case type = "Type"
@@ -126,10 +139,11 @@ struct Landmark: Codable {
     }
 }
 
+// MARK: Pose
 struct Pose: Codable {
-    let pitch: Double
-    let roll: Double
-    let yaw: Double
+    let pitch: Double                     // Pitch angle
+    let roll: Double                      // Roll angle
+    let yaw: Double                       // Yaw angle
 
     enum CodingKeys: String, CodingKey {
         case pitch = "Pitch"
@@ -138,9 +152,10 @@ struct Pose: Codable {
     }
 }
 
+// MARK: Quality
 struct Quality: Codable {
-    let brightness: Double
-    let sharpness: Double
+    let brightness: Double                // Brightness metric
+    let sharpness: Double                 // Sharpness metric
 
     enum CodingKeys: String, CodingKey {
         case brightness = "Brightness"
@@ -148,14 +163,15 @@ struct Quality: Codable {
     }
 }
 
+// MARK: VideoMetadata
 struct VideoMetadata: Codable {
-    let codec: String
-    let colorRange: String
-    let durationMillis: Int
-    let format: String
-    let frameHeight: Int
-    let frameRate: Double
-    let frameWidth: Int
+    let codec: String                     // Codec used for the video
+    let colorRange: String                // Color range information
+    let durationMillis: Int               // Duration of the video in milliseconds
+    let format: String                    // Video format
+    let frameHeight: Int                  // Height of the video frame
+    let frameRate: Double                 // Frame rate of the video
+    let frameWidth: Int                   // Width of the video frame
 
     enum CodingKeys: String, CodingKey {
         case codec = "Codec"
