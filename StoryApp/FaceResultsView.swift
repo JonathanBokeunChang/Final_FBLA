@@ -1,12 +1,20 @@
 import SwiftUI
 
+// MARK: - FaceResultsView
+/// The FaceResultsView displays the outcome of the face detection process.
+/// It includes sections for a header, loading indicator, emotional timeline, video metadata,
+/// and an option to generate a detailed report.
 struct FaceResultsView: View {
-    let faces: [Face]
-    let videoMetadata: VideoMetadata?
-    let dominantEmotions: [String]
-    @State private var isLoading: Bool = true
-    @State private var showReportView: Bool = false
+    
+    // MARK: - Properties
+    let faces: [Face]                           // Array of detected faces
+    let videoMetadata: VideoMetadata?           // Metadata for the recorded video
+    let dominantEmotions: [String]              // List of dominant emotions for each video segment
+    
+    @State private var isLoading: Bool = true   // Flag to control loading state
+    @State private var showReportView: Bool = false // Controls presentation of the report view
 
+    // MARK: - Body
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -21,14 +29,17 @@ struct FaceResultsView: View {
                         videoMetadataView(metadata: metadata)
                     }
                     
+                    // Button to generate and display a report
                     Button("Generate Report") {
                         showReportView = true
                     }
                     .padding()
                     .sheet(isPresented: $showReportView) {
-                        let lengthPlayed = dominantEmotions.count * 5 // Assuming each segment is 5 seconds
-                        let storyInfo = getStoryInfo(for: "ending_justice") // Replace with actual logic to get the ending identifier
-
+                        // Calculate the total time based on segment count (each segment is 5 seconds)
+                        let lengthPlayed = dominantEmotions.count * 5
+                        // Get story info for report details (replace with actual logic if needed)
+                        let storyInfo = getStoryInfo(for: "ending_justice")
+                        
                         ReportView(
                             faces: faces,
                             videoMetadata: videoMetadata,
@@ -44,20 +55,24 @@ struct FaceResultsView: View {
         .navigationTitle("Results")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            // Wait for emotions to be processed
+            // Simulate a delay to wait for emotion processing
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 isLoading = false
             }
         }
     }
-
+    
+    // MARK: - Private Subviews
+    
+    /// Header view displaying the title.
     private var headerView: some View {
         Text("Face Detection Results")
             .font(.largeTitle)
             .fontWeight(.bold)
             .padding()
     }
-
+    
+    /// Loading view with a progress indicator and message.
     private var loadingView: some View {
         VStack {
             ProgressView()
@@ -72,13 +87,15 @@ struct FaceResultsView: View {
         .background(Color.white.opacity(0.8))
         .cornerRadius(10)
     }
-
+    
+    /// View that displays an emotional timeline based on the dominant emotions.
     private var emotionsTimelineView: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("Emotional Timeline")
                 .font(.headline)
                 .padding(.bottom, 5)
             
+            // List each time segment with its corresponding emotion
             ForEach(dominantEmotions.indices, id: \.self) { index in
                 HStack {
                     Text("0:\(index * 5)-0:\((index + 1) * 5)")
@@ -96,7 +113,12 @@ struct FaceResultsView: View {
         .background(Color.white.opacity(0.1))
         .cornerRadius(10)
     }
-
+    
+    // MARK: - Helper Methods
+    
+    /// Creates a view to display video metadata.
+    /// - Parameter metadata: The VideoMetadata object.
+    /// - Returns: A view showing the video's codec, duration, frame rate, and resolution.
     private func videoMetadataView(metadata: VideoMetadata) -> some View {
         VStack(alignment: .leading) {
             Text("Video Metadata")
@@ -111,7 +133,10 @@ struct FaceResultsView: View {
         .background(Color.blue.opacity(0.1))
         .cornerRadius(10)
     }
-
+    
+    /// Returns a color corresponding to the provided emotion.
+    /// - Parameter emotion: The emotion string.
+    /// - Returns: A Color value representing the emotion.
     private func getColorForEmotion(_ emotion: String) -> Color {
         switch emotion {
         case "HAPPY":
@@ -134,7 +159,10 @@ struct FaceResultsView: View {
             return Color.white
         }
     }
-
+    
+    /// Retrieves story information based on an ending identifier.
+    /// - Parameter endingIdentifier: A string identifying the story ending.
+    /// - Returns: A tuple containing the story title and description.
     private func getStoryInfo(for endingIdentifier: String) -> (title: String, description: String) {
         let storyEndings = [
             "ending_justice": ("Justice Served", "You rescue the businessman, but it's revealed he was hiding his crimes. The town is left divided, but justice prevails."),
@@ -146,4 +174,4 @@ struct FaceResultsView: View {
         
         return storyEndings[endingIdentifier] ?? ("Unknown Ending", "No description available.")
     }
-} 
+}
