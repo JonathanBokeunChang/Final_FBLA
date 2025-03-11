@@ -44,14 +44,4 @@ StoryApp is an innovative interactive storytelling application that immerses use
 
 Contributions are welcome! If you have suggestions for improvements, new features, or bug fixes, please open an issue or submit a pull request. We appreciate your feedback and support in making StoryApp even better.
 
-## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
-
-## Acknowledgments
-- Special thanks to the contributors and the open-source community for their invaluable resources and support.
-- This app utilizes SwiftUI for its user interface, providing a modern and responsive design.
-
----
-
-Feel free to customize this README further to fit your app's specific functionalities and features!
