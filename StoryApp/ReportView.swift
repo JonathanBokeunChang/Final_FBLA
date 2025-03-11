@@ -1,19 +1,26 @@
 import SwiftUI
 import PDFKit
 
+// MARK: - ReportView
+/// The ReportView allows users to customize and generate a report based on face detection results,
+/// video metadata, and story details. It also includes functionality to create and save a PDF.
 struct ReportView: View {
-    @State private var includeFaces: Bool = true
-    @State private var includeEmotions: Bool = true
-    @State private var includeMetadata: Bool = true
-    @State private var includeStoryDetails: Bool = true
-    @State private var reportText: String = ""
     
-    let faces: [Face]
-    let videoMetadata: VideoMetadata?
-    let dominantEmotions: [String]
-    @State private var storyTitle: String
-    @State private var storyDescription: String
+    // MARK: - Properties
+    @State private var includeFaces: Bool = true          // Toggle to include faces information
+    @State private var includeEmotions: Bool = true       // Toggle to include emotions data
+    @State private var includeMetadata: Bool = true       // Toggle to include video metadata
+    @State private var includeStoryDetails: Bool = true     // Toggle to include story details
+    @State private var reportText: String = ""            // Generated report text
     
+    let faces: [Face]                                     // Array of detected faces
+    let videoMetadata: VideoMetadata?                     // Video metadata (if available)
+    let dominantEmotions: [String]                        // Dominant emotions for each segment
+    
+    @State private var storyTitle: String                 // Title of the story for the report
+    @State private var storyDescription: String           // Description of the story for the report
+    
+    // MARK: - Initialization
     init(faces: [Face], videoMetadata: VideoMetadata?, dominantEmotions: [String], storyTitle: String, storyDescription: String) {
         self.faces = faces
         self.videoMetadata = videoMetadata
@@ -22,25 +29,30 @@ struct ReportView: View {
         self._storyDescription = State(initialValue: storyDescription)
     }
     
+    // MARK: - Body
     var body: some View {
         VStack {
+            // Form to customize which details to include in the report
             Form {
                 Toggle("Include Faces", isOn: $includeFaces)
                 Toggle("Include Emotions", isOn: $includeEmotions)
                 Toggle("Include Video Metadata", isOn: $includeMetadata)
                 Toggle("Include Story Details", isOn: $includeStoryDetails)
                 
+                // Editable fields for story details when enabled
                 if includeStoryDetails {
                     TextField("Story Title", text: $storyTitle)
                     TextField("Story Description", text: $storyDescription)
                 }
             }
             
+            // Button to trigger report generation
             Button("Generate Report") {
                 generateReport()
             }
             .padding()
             
+            // Display the generated report text if available
             if !reportText.isEmpty {
                 ScrollView {
                     Text(reportText)
@@ -54,8 +66,10 @@ struct ReportView: View {
         .navigationTitle("Customize Report")
     }
     
+    // MARK: - Report Generation Methods
+    
+    /// Gathers selected data and constructs the report text.
     func generateReport() {
-        // Collect data based on user selections
         var reportData = [String]()
         
         if includeStoryDetails {
@@ -75,13 +89,18 @@ struct ReportView: View {
             reportData.append("Video Metadata: Codec: \(metadata.codec), Duration: \(metadata.durationMillis) ms, Frame Rate: \(metadata.frameRate) fps, Resolution: \(metadata.frameWidth)x\(metadata.frameHeight)")
         }
         
-        // Update the report text
+        // Update the report text displayed to the user.
         reportText = reportData.joined(separator: "\n")
     }
     
+    // MARK: - PDF Generation Methods
+    
+    /// Creates a PDF page with the given text.
+    /// - Parameter text: The text to be rendered on the PDF page.
+    /// - Returns: An optional PDFPage if creation is successful.
     func createPDFPage(with text: String) -> PDFPage? {
-        // Create a page with a standard size
-        let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792) // 8.5 x 11 inches
+        // Define a standard page size (8.5 x 11 inches)
+        let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
         let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
         
         let data = renderer.pdfData { context in
@@ -93,7 +112,7 @@ struct ReportView: View {
             text.draw(in: pageRect.insetBy(dx: 20, dy: 20), withAttributes: attributes)
         }
         
-        // Create a PDFDocument from the data and return the first page
+        // Create a PDFDocument from the rendered data and return the first page.
         if let document = PDFDocument(data: data) {
             return document.page(at: 0)
         }
@@ -101,12 +120,14 @@ struct ReportView: View {
         return nil
     }
     
+    /// Saves the provided PDF document to the app's documents directory.
+    /// - Parameter document: The PDFDocument to be saved.
     func savePDF(_ document: PDFDocument) {
-        // Get the documents directory path
+        // Locate the documents directory.
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let pdfPath = documentsPath.appendingPathComponent("Report.pdf")
         
-        // Write the PDF document to the file
+        // Attempt to write the PDF to disk.
         if document.write(to: pdfPath) {
             print("PDF saved successfully at \(pdfPath)")
         } else {
