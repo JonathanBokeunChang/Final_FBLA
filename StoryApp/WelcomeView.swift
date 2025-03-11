@@ -1,6 +1,8 @@
 import SwiftUI
 
+// MARK: - WelcomeView
 struct WelcomeView: View {
+    // MARK: - State Variables and Properties
     @State private var isTextVisible = false
     @State private var showMainStory = false
     @State private var showResults = false
@@ -11,9 +13,10 @@ struct WelcomeView: View {
     @State private var selectedGenre: String = "Default"
     let genres = ["Default", "Horror", "Thriller", "Cozy"]
 
+    // MARK: - Body
     var body: some View {
         ZStack {
-            // Same noir background as StoryView
+            // MARK: - Background Gradient
             LinearGradient(
                 colors: [
                     Color(.sRGB, red: 0.1, green: 0.1, blue: 0.2, opacity: 1),
@@ -24,19 +27,22 @@ struct WelcomeView: View {
             )
             .ignoresSafeArea()
             
-            // Rain effect
+            // MARK: - Rain Effect Overlay
             GeometryReader { geometry in
                 ForEach(0..<50) { _ in
                     Circle()
                         .fill(.white.opacity(0.1))
                         .frame(width: 2, height: 10)
-                        .offset(x: CGFloat.random(in: 0...geometry.size.width),
-                                y: CGFloat.random(in: 0...geometry.size.height))
+                        .offset(
+                            x: CGFloat.random(in: 0...geometry.size.width),
+                            y: CGFloat.random(in: 0...geometry.size.height)
+                        )
                 }
             }
             
+            // MARK: - Main Content
             VStack(spacing: 40) {
-                // Badge icon
+                // MARK: - Badge Icon
                 Image(systemName: "shield.fill")
                     .font(.system(size: 80))
                     .foregroundStyle(.red.opacity(0.8))
@@ -47,6 +53,7 @@ struct WelcomeView: View {
                     )
                     .shadow(color: .red.opacity(0.3), radius: 20, x: 0, y: 10)
                 
+                // MARK: - Title and Subtitle
                 VStack(spacing: 20) {
                     Text("WELCOME, DETECTIVE")
                         .font(.system(.title, design: .monospaced))
@@ -59,17 +66,16 @@ struct WelcomeView: View {
                 }
                 .opacity(isTextVisible ? 1 : 0)
                 
+                // MARK: - Instructions Text
                 VStack(spacing: 15) {
-                    
                     Text("Your Job is to investigate the case \n by choosing between two dire options. \n Your face will be recorded throughout the \n investigation to determine your emotions.\n First, pick a story mode")
                         .font(.system(.body, design: .serif))
                         .foregroundStyle(.gray)
                         .multilineTextAlignment(.center)
-                    
                 }
                 .opacity(isTextVisible ? 1 : 0)
                 
-                // Genre Picker
+                // MARK: - Genre Picker
                 Picker("Select Genre", selection: $selectedGenre) {
                     ForEach(genres, id: \.self) { genre in
                         Text(genre).tag(genre)
@@ -78,10 +84,8 @@ struct WelcomeView: View {
                 .pickerStyle(SegmentedPickerStyle())
                 .padding()
                 
+                // MARK: - Begin Investigation Button
                 VStack {
-                    
-                    
-                    
                     Button("BEGIN INVESTIGATION") {
                         withAnimation(.spring()) {
                             showMainStory = true
@@ -93,6 +97,7 @@ struct WelcomeView: View {
                 .padding()
             }
             
+            // MARK: - Help Button (Bottom Right)
             VStack {
                 Spacer()
                 HStack {
@@ -108,6 +113,7 @@ struct WelcomeView: View {
                 }
             }
         }
+        // MARK: - View Lifecycle Modifiers
         .onAppear {
             withAnimation(.easeIn(duration: 1.5)) {
                 isTextVisible = true
@@ -116,20 +122,23 @@ struct WelcomeView: View {
         .fullScreenCover(isPresented: $showMainStory) {
             StoryView(cameraManager: cameraManager, showResults: $showResults)
                 .onAppear {
-                    StoryManager.shared.currentSceneId = selectedGenre // Set the current scene based on selected genre
+                    // Set the current scene based on selected genre
+                    StoryManager.shared.currentSceneId = selectedGenre
                 }
         }
         .sheet(isPresented: $showHelp) {
             HelpView()
         }
     }
-
+    
+    // MARK: - Helper Functions
+    /// Generates a story part based on the selected genre by making a network request.
     private func generateStoryPart() {
         // Assuming you have a way to get the current story part
         let currentStoryPart = "This is the current story part." // Replace with actual story part
         let systemMessage = "Modify the following story part to fit the genre \(selectedGenre): \(currentStoryPart)"
         
-        // Prepare the request to the GPT API
+        // MARK: - Prepare Request for GPT API
         let url = URL(string: "https://b3de-2601-8c-4a7e-3cd0-340f-2fbc-361c-5ab9.ngrok-free.app/gpt")! // Replace with your actual API URL
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -138,7 +147,7 @@ struct WelcomeView: View {
         let body: [String: Any] = ["input": systemMessage]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         
-        // Perform the API request
+        // MARK: - Perform the API Request
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error: \(error.localizedDescription)")
@@ -156,4 +165,4 @@ struct WelcomeView: View {
             }
         }.resume()
     }
-} 
+}
